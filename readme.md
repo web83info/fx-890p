@@ -21,5 +21,6 @@
 | --- | --- | --- |
 | [BASIC Command Converter](basic-command-converter/readme.md) | 省略形で入力したBASICコマンドのコンバーター | マシン語 |
 | [DisAssembler FX](disassembler-fx/readme.md) | ポケコン上で動くディスアセンブラ | BASIC |
+| [LINES-5](lines5/readme.md) | BASICから5行表示を可能にするマシン語プログラム | マシン語 |
 | [MTOOL Ver1.00](mtool100/readme.md) | マシン語プログラムインストーラーを生成するBASICプログラム | BASIC |
 | [Overnight Sensation Remix](overnight-sensation-remix/readme.md) | 矢印を回転させて消すパズルゲーム | マシン語 |
