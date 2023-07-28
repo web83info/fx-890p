@@ -23,5 +23,6 @@
 | [DisAssembler FX](disassembler-fx/readme.md) | ポケコン上で動くディスアセンブラ | BASIC |
 | [Real Inkey$](real-inkey/readme.md) | BASICで同時キー入力判定をするためのマシン語プログラム | マシン語 |
 | [LINES-5](lines5/readme.md) | BASICから5行表示を可能にするマシン語プログラム | マシン語 |
+| [Let's Screen Capture](lets-screen-capture/readme.md) | スクリーンキャプチャを取得するプログラム | マシン語 |
 | [MTOOL Ver1.00](mtool100/readme.md) | マシン語プログラムインストーラーを生成するBASICプログラム | BASIC |
 | [Overnight Sensation Remix](overnight-sensation-remix/readme.md) | 矢印を回転させて消すパズルゲーム | マシン語 |
