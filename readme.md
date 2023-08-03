@@ -14,6 +14,7 @@
 | [Number Breaker](number-breaker/readme.md) | 4つのヒントを手掛かりにして、隠された4つの数字とその順番を推理するゲーム | BASIC |
 | [Poker Action for FX-890P](poker-action/readme.md) | 流れてくるトランプを並べてポーカーの役を作る落ち物ゲーム | マシン語 |
 | [ゼロヨン de GO!](zero-yon-de-go/readme.md) | ポケコンでできるゼロヨンゲーム | BASIC |
+| [モンキー de ウッキー](monkey/readme.md) | 流れてくる数字を10にして消すアクションパズルゲーム | BASIC |
 
 ## ユーティリティー
 
