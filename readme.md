@@ -22,7 +22,7 @@
 | タイトル | 内容 | 言語 |
 | --- | --- | --- |
 | [Anytime Register](anytime-register/readme.md) | プログラム実行中に任意のタイミングでレジスタの値を表示するマシン語プログラム | マシン語 |
-| [Any Time Stopper](any-time-stopper/readme.md) | プログラム実行中に任意のタイミングでポーズさせるマシン語プログラム | マシン語 |
+| [Anytime Stopper](anytime-stopper/readme.md) | プログラム実行中に任意のタイミングでポーズさせるマシン語プログラム | マシン語 |
 | [BASIC Command Converter](basic-command-converter/readme.md) | 省略形で入力したBASICコマンドのコンバーター | マシン語 |
 | [DisAssembler FX](disassembler-fx/readme.md) | ポケコン上で動くディスアセンブラ | BASIC |
 | [Real Inkey$](real-inkey/readme.md) | BASICで同時キー入力判定をするためのマシン語プログラム | マシン語 |
