@@ -25,6 +25,7 @@
 | [Anytime Stopper](anytime-stopper/readme.md) | プログラム実行中に任意のタイミングでポーズさせるマシン語プログラム | マシン語 |
 | [BASIC Command Converter](basic-command-converter/readme.md) | 省略形で入力したBASICコマンドのコンバーター | マシン語 |
 | [DisAssembler FX](disassembler-fx/readme.md) | ポケコン上で動くディスアセンブラ | BASIC |
+| [Here Comes the Boss](here-comes-the-boss/readme.md) | ボスが来たときにダミー画面を表示するマシン語プログラム | マシン語 |
 | [Real Inkey$](real-inkey/readme.md) | BASICで同時キー入力判定をするためのマシン語プログラム | マシン語 |
 | [LINES-5](lines5/readme.md) | BASICから5行表示を可能にするマシン語プログラム | マシン語 |
 | [Let's Screen Capture](lets-screen-capture/readme.md) | スクリーンキャプチャを取得するプログラム | マシン語 |
