@@ -13,6 +13,8 @@
 | [Mine Sweeper FX](mine-sweeper-fx/readme.md) | Windowsでおなじみの爆弾探しゲーム | マシン語 |
 | [MIRRORIS-V](mirroris-v/readme.md) | フラッシュボールを鏡で反射させて消す落ち物ゲーム | マシン語 |
 | [Number Breaker](number-breaker/readme.md) | 4つのヒントを手掛かりにして、隠された4つの数字とその順番を推理するゲーム | BASIC |
+| [Overnight Sensation Remix](overnight-sensation-remix/readme.md) | 矢印を回転させて消すパズルゲーム | マシン語 |
+| [Overnight Sensation Remi2](overnight-sensation-remi2/readme.md) | 矢印を回転させて消すパズルゲームの改良版 | マシン語 |
 | [Poker Action for FX-890P](poker-action/readme.md) | 流れてくるトランプを並べてポーカーの役を作る落ち物ゲーム | マシン語 |
 | [ゼロヨン de GO!](zero-yon-de-go/readme.md) | ポケコンでできるゼロヨンゲーム | BASIC |
 | [モンキー de ウッキー](monkey/readme.md) | 流れてくる数字を10にして消すアクションパズルゲーム | BASIC |
@@ -30,4 +32,3 @@
 | [Let's Screen Capture](lets-screen-capture/readme.md) | スクリーンキャプチャを取得するプログラム | マシン語 |
 | [MTOOL Ver1.00](mtool100/readme.md) | マシン語プログラムインストーラーを生成するBASICプログラム | BASIC |
 | [MTOOL Ver1.50](mtool150/readme.md) | マシン語プログラムインストーラーを生成するBASICプログラムの改良版 | BASIC |
-| [Overnight Sensation Remix](overnight-sensation-remix/readme.md) | 矢印を回転させて消すパズルゲーム | マシン語 |
