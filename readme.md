@@ -26,6 +26,7 @@
 | [Anytime Register](anytime-register/readme.md) | プログラム実行中に任意のタイミングでレジスタの値を表示するマシン語プログラム | マシン語 |
 | [Anytime Stopper](anytime-stopper/readme.md) | プログラム実行中に任意のタイミングでポーズさせるマシン語プログラム | マシン語 |
 | [BASIC Command Converter](basic-command-converter/readme.md) | 省略形で入力したBASICコマンドのコンバーター | マシン語 |
+| [Data Convertor Ver.1.0](data-convertor/readme.md) | GPRINT形式のデータをDEFCHR$形式に変換 | BASIC |
 | [DisAssembler FX](disassembler-fx/readme.md) | ポケコン上で動くディスアセンブラ | BASIC |
 | [Here Comes the Boss](here-comes-the-boss/readme.md) | ボスが来たときにダミー画面を表示するマシン語プログラム | マシン語 |
 | [Real Inkey$](real-inkey/readme.md) | BASICで同時キー入力判定をするためのマシン語プログラム | マシン語 |
