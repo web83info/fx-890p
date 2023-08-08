@@ -15,6 +15,7 @@
 | [Number Breaker](number-breaker/readme.md) | 4つのヒントを手掛かりにして、隠された4つの数字とその順番を推理するゲーム | BASIC |
 | [Overnight Sensation Remix](overnight-sensation-remix/readme.md) | 矢印を回転させて消すパズルゲーム | マシン語 |
 | [Overnight Sensation Remi2](overnight-sensation-remi2/readme.md) | 矢印を回転させて消すパズルゲームの改良版 | マシン語 |
+| [Panic Maker](panic-maker/readme.md) | 平面版ルービックキューブのようなゲーム | BASIC |
 | [Poker Action for FX-890P](poker-action/readme.md) | 流れてくるトランプを並べてポーカーの役を作る落ち物ゲーム | マシン語 |
 | [ゼロヨン de GO!](zero-yon-de-go/readme.md) | ポケコンでできるゼロヨンゲーム | BASIC |
 | [モンキー de ウッキー](monkey/readme.md) | 流れてくる数字を10にして消すアクションパズルゲーム | BASIC |
