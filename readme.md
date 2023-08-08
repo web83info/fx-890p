@@ -9,6 +9,7 @@
 | [3D-MAZE](3d-maze/readme.md) | 3D迷路 | マシン語 |
 | [CYCLES 890P](cycles-890p/readme.md) | 落ちてくる矢印で輪を作り消す落ち物ゲーム | マシン語 |
 | [GALAXY WALL FX-890P](galaxy-wall-fx-890p/readme.md) | 流れてくるブロックを消していく落ち物ゲーム | マシン語 |
+| [GALAXY WALL TWIN β1](galaxy-wall-twin-beta1/readme.md) | 流れてくるブロックを消していく対戦型落ち物ゲーム | マシン語 |
 | [Left or Right](left-or-right/readme.md) | あなたの右と左の感覚を狂わせてさしあげるゲーム | BASIC |
 | [Mine Sweeper FX](mine-sweeper-fx/readme.md) | Windowsでおなじみの爆弾探しゲーム | マシン語 |
 | [MIRRORIS-V](mirroris-v/readme.md) | フラッシュボールを鏡で反射させて消す落ち物ゲーム | マシン語 |
