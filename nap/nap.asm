@@ -1,0 +1,1262 @@
+;******************************************************************************
+;                     ナンプレ自動解答プログラム「ＮＡＰ」
+;
+;                     Number-place Auto-answering Program
+;
+;                        1998 (C) Copyright by ABCP.
+;                           All Rights Reserved.
+;******************************************************************************
+
+	.186
+CODE	SEGMENT
+	ASSUME	CS:CODE,DS:CODE,SS:CODE,ES:CODE
+
+	ORG	0100H
+START:
+	ORG	2000H
+
+;******************************************************************************
+;初期設定
+;******************************************************************************
+INIT:
+	CLD
+	XOR	AX,AX
+	MOV	DS,AX
+	MOV	ES,AX
+
+;******************************************************************************
+;タイトル
+;******************************************************************************
+TITLE:
+	MOV	AH,10H
+	INT	41H
+	MOV	AH,0FH
+	MOV	BX,0103H
+	INT	41H
+	MOV	AH,20H
+	MOV	DI,OFFSET COPYRIGHT_1
+	INT	41H
+	MOV	AH,0FH
+	MOV	BX,0206H
+	INT	41H
+
+	MOV	AH,20H
+	MOV	DI,OFFSET COPYRIGHT_2
+	INT	41H
+
+	XOR	CX,CX
+TITLE_WAIT:
+	PUSH	AX
+	POP	AX
+	LOOP	TITLE_WAIT
+
+	MOV	AH,10H
+	INT	41H
+
+	MOV	DI,OFFSET LINE_DAT
+	MOV	AH,13H
+	MOV	DL,80H
+TITLE_LINE:
+	MOV	BL,[DI]
+	MOV	BH,[DI+1]
+	MOV	CL,[DI+2]
+	MOV	CH,[DI+3]
+	CMP	BL,-1
+	JZ	TITLE_LINE_END
+	INT	41H
+	ADD	DI,4
+	JMP	TITLE_LINE
+TITLE_LINE_END:
+	MOV	AH,11H
+	MOV	BH,0
+	INT	41H
+
+	MOV	AH,0FH
+	MOV	BX,0309H
+	INT	41H
+	MOV	AH,20H
+	MOV	DI,OFFSET PUSH_SPACE_KEY
+	INT	41H
+
+	MOV	AH,1BH
+	INT	41H
+TITLE_SPACE:
+	MOV	AH,1DH
+	INT	41H
+	CMP	DL,' '
+	JNZ	TITLE_SPACE
+
+;******************************************************************************
+;問題入力
+;******************************************************************************
+INPUT:
+	MOV	AH,1BH
+	INT	41H
+
+	XOR	AX,AX			;パズル面の初期化
+	MOV	DI,OFFSET NUMBER
+	MOV	CX,81
+	REP	STOSB
+
+	MOV	AH,10H			;画面クリア
+	INT	41H
+	MOV	AH,0FH
+	MOV	BX,0002H
+	INT	41H
+	MOV	AH,20H
+	MOV	DI,OFFSET INPUT_MOJI
+	INT	41H
+	CALL	SCREEN
+
+	MOV	BX,0101H
+INPUT_1:				;カーソル部の反転表示
+	MOV	CX,BX			;表示用座標への補正
+	CMP	BH,7
+	JC	INPUT_A
+	ADD	CL,10
+	SUB	CH,3
+INPUT_A:
+	CMP	BH,4
+	JC	INPUT_B
+	ADD	CL,10
+	SUB	CH,3
+INPUT_B:
+	MOV	AH,0FH
+	PUSH	BX
+	MOV	BX,CX
+	INT	41H
+	POP	BX
+	MOV	AH,0BH
+	INT	41H			;反転表示
+	MOV	AH,1
+	CALL	XY
+	MOV	DL,BYTE PTR [DI+OFFSET NUMBER]
+	ADD	DL,30H
+	INT	41H
+	MOV	AH,0CH
+	INT	41H			;通常表示
+INPUT_3:
+	MOV	AH,1DH			;INKEY$
+	INT	41H
+	CMP	DH,0			;押されるまで待つ
+	JZ	INPUT_3
+	CMP	DL,0CH
+	JNZ	INPUT_BRK
+	MOV	AH,10H
+	INT	41H
+	IRET
+INPUT_BRK:
+	MOV	AH,30H			;数字かどうか判断する
+	INT	41H
+	CMP	DH,1
+	JZ	INPUT_4
+	PUSH	BX			;数字を記憶
+	MOV	BX,CX
+	MOV	AH,0FH
+	INT	41H
+	MOV	AH,1
+	INT	41H
+	POP	BX
+	CALL	XY
+	SUB	DL,30H
+	MOV	BYTE PTR [DI+OFFSET NUMBER],DL
+	INC	BL
+	CMP	BL,10
+	JNZ	INPUT_NEXT
+	MOV	BL,1
+	INC	BH
+	CMP	BH,10
+	JNZ	INPUT_NEXT
+	MOV	BX,0909H
+INPUT_NEXT:
+	JMP	INPUT_1
+INPUT_4:
+	MOV	AX,BX
+
+	CMP	DL,28			;→
+	JNZ	INPUT_5
+	INC	BL
+	CMP	BL,10
+	JNZ	INPUT_5
+	DEC	BL
+	CMP	BH,9
+	JZ	INPUT_5
+	INC	BH
+	MOV	BL,1
+INPUT_5:
+	CMP	DL,29			;←
+	JNZ	INPUT_6
+	DEC	BL
+	CMP	BL,0
+	JNZ	INPUT_6
+	INC	BL
+	CMP	BH,1
+	JZ	INPUT_6
+	DEC	BH
+	MOV	BL,9
+INPUT_6:
+	CMP	DL,30			;↑
+	JNZ	INPUT_7
+	CMP	BH,1
+	JNA	INPUT_7
+	DEC	BH
+INPUT_7:
+	CMP	DL,31			;↓
+	JNZ	INPUT_8
+	CMP	BH,9
+	JNC	INPUT_8
+	INC	BH
+INPUT_8:
+	CMP	DL,6			;SHIFT＋→
+	JNZ	INPUT_9
+	MOV	BL,9
+INPUT_9:
+	CMP	DL,2			;SHIFT＋←
+	JNZ	INPUT_10
+	MOV	BL,1
+INPUT_10:
+	CMP	DL,16			;SHIFT＋↑
+	JNZ	INPUT_11
+	MOV	BH,1
+INPUT_11:
+	CMP	DL,1			;SHIFT＋↓
+	JNZ	INPUT_12
+	MOV	BH,9
+INPUT_12:
+	CMP	DL,253			;SHIFT＋RET
+	JNZ	INPUT_13
+	CMP	BH,9
+	JZ	INPUT_13
+	MOV	BL,1
+	INC	BH
+INPUT_13:
+	CMP	AX,BX
+	JZ	INPUT_99
+
+	PUSH	BX			;カーソルを消す
+	MOV	BX,CX			;CX=反転していたところの座標の補正後
+	PUSH	AX
+	MOV	AH,0FH
+	INT	41H
+	POP	AX
+	MOV	BX,AX			;AX=反転していたところの座標の補正前
+	CALL	XY
+	MOV	AH,1
+	MOV	DL,BYTE PTR [DI+OFFSET NUMBER]
+	ADD	DL,30H
+	INT	41H
+	POP	BX
+	JMP	INPUT_1
+INPUT_99:
+	CMP	DL,13
+	JZ	INPUT_END
+	JMP	INPUT_1
+INPUT_END:
+	CALL	SCREEN
+
+	CALL	FILLED			;既に埋められている数字の個数を記録する
+	MOV	BYTE PTR FINISH_CHECK,AL
+
+;******************************************************************************
+;解析ＬＶ１
+;******************************************************************************
+LEVEL_1:				;確定しやすい数字を見つける
+	MOV	BYTE PTR LEVEL,1
+	CALL	LEVEL_PRINT
+
+	CALL	LEVEL_1_MAIN
+
+;******************************************************************************
+;ＬＶ１で解けたかな？
+;******************************************************************************
+	MOV	BYTE PTR CLEAR_CHECK_FLAG,0
+	CALL	CLEAR_CHECK
+	CALL	PARADOX
+
+	MOV	AL,BYTE PTR CLEAR_CHECK_FLAG
+	CMP	AL,0
+	JNZ	LEVEL_1_CLEAR_1
+	JMP	LEVEL_1
+LEVEL_1_CLEAR_1:
+	CMP	AL,1			;CLEAR_CHECK_FLAG=1矛盾が生じた
+	JNZ	LEVEL_1_CLEAR_2
+	JMP	ERROR_END
+LEVEL_1_CLEAR_2:
+	CMP	AL,-1
+	JNZ	LEVEL_2
+	JMP	CLEAR
+
+;******************************************************************************
+;解析ＬＶ２
+;******************************************************************************
+LEVEL_2:				;確定しやすいマスを見つける
+	MOV	BYTE PTR LEVEL,2
+	CALL	LEVEL_PRINT
+	CALL	LEVEL_2_MAIN
+
+;******************************************************************************
+;ＬＶ２で解けたかな？
+;******************************************************************************
+	MOV	BYTE PTR CLEAR_CHECK_FLAG,0
+	CALL	CLEAR_CHECK
+	CALL	PARADOX
+
+	MOV	AL,BYTE PTR CLEAR_CHECK_FLAG
+	CMP	AL,0
+	JNZ	LEVEL_2_CLEAR_1
+	JMP	LEVEL_1
+LEVEL_2_CLEAR_1:
+	CMP	AL,1			;CLEAR_CHECK_FLAG=1矛盾が生じた
+	JNZ	LEVEL_2_CLEAR_2
+	JMP	ERROR_END
+LEVEL_2_CLEAR_2:
+	CMP	AL,-1
+	JNZ	LEVEL_3
+	JMP	CLEAR
+
+;******************************************************************************
+;解析ＬＶ３
+;******************************************************************************
+LEVEL_3:
+	MOV	BYTE PTR LEVEL,3
+	CALL	LEVEL_PRINT
+
+	CALL	FLAG_CLEAR
+
+	MOV	BYTE PTR NOW_NUMBER,1	;すべての数字についてフラグを立てる
+LEVEL_3_A:
+	CALL	FLAG_CHECK_BEGIN_2
+	INC	BYTE PTR NOW_NUMBER
+	CMP	BYTE PTR NOW_NUMBER,10
+	JNZ	LEVEL_3_A
+
+
+	MOV	BH,1
+TRY_A:
+	MOV	BL,1
+TRY_1:
+	MOV	BYTE PTR NOW_NUMBER,1
+TRY_2:
+	CALL	XY
+	CMP	BYTE PTR [DI+OFFSET NUMBER],0
+	JZ	TRY_TEMP_2		;既に数字が入っている
+	JMP	TRY_PUT_3
+TRY_TEMP_2:
+	CALL	XY2
+	MOV	CL,BYTE PTR NOW_NUMBER
+	MOV	AX,WORD PTR [DI+OFFSET NUMBER_FLAG]
+	RCR	AX,CL
+	JNC	TRY_TEMP
+	JMP	TRY_3			;既にその数字は入れないことが判っている
+TRY_TEMP:
+	MOV	SI,OFFSET NUMBER
+	MOV	DI,OFFSET NUMBER_BACKUP
+	MOV	CX,81
+	REP	MOVSB
+	MOV	SI,OFFSET NUMBER_FLAG
+	MOV	DI,OFFSET NUMBER_FLAG_BACKUP
+	MOV	CX,162
+	REP	MOVSB
+	MOV	AL,BYTE PTR NOW_NUMBER
+	MOV	BYTE PTR NOW_NUMBER_BACKUP,AL
+	MOV	AL,BYTE PTR FINISH_CHECK
+	MOV	BYTE PTR FINISH_CHECK_BACKUP,AL
+
+	CALL	XY
+	MOV	AL,BYTE PTR NOW_NUMBER	;仮に入れてみて周りの様子を調べる
+	MOV	BYTE PTR [DI+OFFSET NUMBER],AL
+
+LEVEL_3_LOOP:
+	CALL	LEVEL_1_MAIN
+	MOV	BYTE PTR CLEAR_CHECK_FLAG,0
+	CALL	CLEAR_CHECK
+	CALL	PARADOX
+	MOV	AH,BYTE PTR CLEAR_CHECK_FLAG
+	CMP	AH,0
+	JZ	LEVEL_3_LOOP
+
+	CALL	LEVEL_2_MAIN
+	MOV	BYTE PTR CLEAR_CHECK_FLAG,0
+	CALL	CLEAR_CHECK
+	CALL	PARADOX
+	MOV	AH,BYTE PTR CLEAR_CHECK_FLAG
+	CMP	AH,0
+	JZ	LEVEL_3_LOOP
+
+	MOV	SI,OFFSET NUMBER_BACKUP
+	MOV	DI,OFFSET NUMBER
+	MOV	CX,81
+	REP	MOVSB
+	MOV	SI,OFFSET NUMBER_FLAG_BACKUP
+	MOV	DI,OFFSET NUMBER_FLAG
+	MOV	CX,162
+	REP	MOVSB
+	MOV	AL,BYTE PTR NOW_NUMBER_BACKUP
+	MOV	BYTE PTR NOW_NUMBER,AL
+	MOV	AL,BYTE PTR FINISH_CHECK_BACKUP
+	MOV	BYTE PTR FINISH_CHECK,AL
+
+	CMP	AH,1
+	JNZ	TRY_3
+	XOR	AX,AX
+	STC
+	MOV	CL,BYTE PTR NOW_NUMBER
+	RCL	AX,CL			;0000 0009 8765 4321
+	CALL	XY2
+	OR	WORD PTR [DI+OFFSET NUMBER_FLAG],AX
+TRY_3:
+	INC	BYTE PTR NOW_NUMBER
+	CMP	BYTE PTR NOW_NUMBER,10
+	JZ	TRY_4
+	JMP	TRY_2
+TRY_4:
+	XOR	DL,DL
+	CALL	XY2
+	MOV	AX,WORD PTR [DI+OFFSET NUMBER_FLAG]
+	XOR	CX,CX
+	MOV	CL,1
+TRY_PUT_1:
+	RCR	AX,1
+	JC	TRY_PUT_2
+	INC	DL
+	MOV	DH,CL
+TRY_PUT_2:
+	INC	CL
+	CMP	CL,10
+	JNZ	TRY_PUT_1
+
+	CMP	DL,1
+	JNZ	TRY_PUT_3
+	CALL	XY
+	MOV	BYTE PTR [DI+OFFSET NUMBER],DH
+	MOV	AH,1
+	CALL	SCREEN_SUB
+	JMP	LEVEL_1
+
+TRY_PUT_3:
+	INC	BL
+	CMP	BL,10
+	JZ	TRY_5
+	JMP	TRY_1
+TRY_5:
+	INC	BH
+	CMP	BH,10
+	JZ	TRY_6
+	JMP	TRY_A
+TRY_6:
+
+;******************************************************************************
+;ＬＶ３で解けたかな？
+;******************************************************************************
+	MOV	BYTE PTR CLEAR_CHECK_FLAG,0
+	CALL	CLEAR_CHECK
+	CALL	PARADOX
+
+	MOV	AL,BYTE PTR CLEAR_CHECK_FLAG
+	CMP	AL,0
+	JNZ	LEVEL_3_CLEAR_1
+	JMP	LEVEL_1
+LEVEL_3_CLEAR_1:
+	CMP	AL,1			;CLEAR_CHECK_FLAG=1矛盾が生じた
+	JNZ	LEVEL_3_CLEAR_2
+	JMP	ERROR_END
+LEVEL_3_CLEAR_2:
+	CMP	AL,-1
+	JZ	CLEAR
+
+;******************************************************************************
+;限界です。ごめんなさい _(._.)_
+;******************************************************************************
+LIMIT:
+	MOV	DI,OFFSET MOJI_SORRY
+	CALL	WINDOW
+	JMP	CONT
+;******************************************************************************
+;クリア！
+;******************************************************************************
+CLEAR:
+	MOV	DI,OFFSET MOJI_CLEAR
+	CALL	WINDOW
+	JMP	CONT
+
+;******************************************************************************
+;エラー
+;******************************************************************************
+ERROR_END:
+	MOV	DI,OFFSET MOJI_ERROR
+	CALL	WINDOW
+	JMP	CONT
+;******************************************************************************
+;コンティニュー
+;******************************************************************************
+CONT:
+	XOR	CX,CX
+CONT_LOOP:
+	PUSHA
+	POPA
+	LOOP	CONT_LOOP
+
+	CALL	SCREEN
+	MOV	AH,1BH
+	INT	41H
+CONT_1:
+	MOV	AH,1DH
+	INT	41H
+	CMP	DL,0CH
+	JNZ	CONT_2
+	MOV	AH,0FH
+	XOR	BX,BX
+	INT	41H
+	IRET
+CONT_2:
+	CMP	DL,13
+	JNZ	CONT_1
+	JMP	INPUT
+
+;******************************************************************************
+;確定しやすい数字を探して埋めていく。
+;******************************************************************************
+LEVEL_1_MAIN:
+	MOV	BYTE PTR NOW_NUMBER,1
+SEARCH_NOW_NUMBER:
+	CALL	FLAG_CHECK_BEGIN
+	CALL	PUT_BEGIN
+	INC	BYTE PTR NOW_NUMBER
+	CMP	BYTE PTR NOW_NUMBER,10
+	JNZ	SEARCH_NOW_NUMBER
+	RET
+
+;******************************************************************************
+;ある数字が埋められないところにフラグを立てる。
+;******************************************************************************
+FLAG_CHECK_BEGIN:
+	CALL	FLAG_CLEAR
+					;0000 0009 8765 4321 フラグの形式
+FLAG_CHECK_BEGIN_2:
+	PUSHA
+	MOV	BH,1
+SEARCH_1:
+	MOV	BL,1
+SEARCH_2:
+	CALL	XY
+	MOV	AL,BYTE PTR NOW_NUMBER
+	MOV	DL,BYTE PTR [DI+OFFSET NUMBER]
+	CMP	DL,AL
+	JZ	FLAG_BEGIN
+	CMP	DL,0
+	JNZ	FLAG_ONE
+	JMP	SEARCH_3
+FLAG_ONE:
+	CALL	XY2
+	XOR	AX,AX
+	STC
+	MOV	CL,BYTE PTR NOW_NUMBER
+	RCL	AX,CL
+	OR	WORD PTR [DI+OFFSET NUMBER_FLAG],AX
+	JMP	SEARCH_3
+
+FLAG_BEGIN:				;縦,横,３＊３にフラグを立てる
+	PUSH	BX
+	MOV	BL,1
+FLAG_1:					;横にフラグを立てる
+	CALL	XY2
+	XOR	AX,AX
+	STC
+	MOV	CL,BYTE PTR NOW_NUMBER
+	RCL	AX,CL
+	OR	WORD PTR [DI+OFFSET NUMBER_FLAG],AX
+	INC	BL
+	CMP	BL,10
+	JNZ	FLAG_1
+	POP	BX
+
+	PUSH	BX
+	MOV	BH,1
+FLAG_2:					;縦にフラグを立てる
+	CALL	XY2
+	XOR	AX,AX
+	STC
+	MOV	CL,BYTE PTR NOW_NUMBER
+	RCL	AX,CL
+	OR	WORD PTR [DI+OFFSET NUMBER_FLAG],AX
+	INC	BH
+	CMP	BH,10
+	JNZ	FLAG_2
+	POP	BX
+
+	PUSH	BX
+	MOV	AH,BL			;X,Yを３＊３の左上に調整
+	ADD	AH,2
+	MOV	AL,3
+	CALL	WARI
+	MOV	AL,AH
+	ADD	AH,AH
+	ADD	AH,AL
+	SUB	AH,2
+	MOV	BL,AH
+
+	MOV	AH,BH
+	ADD	AH,2
+	MOV	AL,3
+	CALL	WARI
+	MOV	AL,AH
+	ADD	AH,AH
+	ADD	AH,AL
+	SUB	AH,2
+	MOV	BH,AH
+
+	MOV	CL,3
+FLAG_3_3_1:
+	MOV	CH,3
+FLAG_3_3_2:
+	CALL	XY2
+	PUSH	CX
+	XOR	AX,AX
+	STC
+	MOV	CL,BYTE PTR NOW_NUMBER
+	RCL	AX,CL
+	OR	WORD PTR [DI+OFFSET NUMBER_FLAG],AX
+	POP	CX
+	INC	BL
+	DEC	CH
+	JNZ	FLAG_3_3_2
+	SUB	BL,3
+	INC	BH
+	LOOP	FLAG_3_3_1
+	POP	BX
+SEARCH_3:
+	INC	BL
+	CMP	BL,10
+	JZ	SEARCH_4
+	JMP	SEARCH_2
+SEARCH_4:
+	INC	BH
+	CMP	BH,10
+	JZ	SEARCH_5
+	JMP	SEARCH_1
+SEARCH_5:
+	POPA
+	RET
+
+FLAG_CLEAR:
+	PUSHA
+	XOR	AX,AX			;フラグ初期化
+	MOV	CX,162
+	MOV	DI,OFFSET NUMBER_FLAG
+	REP	STOSB
+	POPA
+	RET
+
+;******************************************************************************
+;確定しやすいマスに数字を入れる。
+;******************************************************************************
+PUT_BEGIN:
+	PUSHA
+	MOV	BH,1
+PUT_1:
+	MOV	BL,1
+	XOR	AL,AL			;AL=空いてるマスの数
+PUT_2:
+	CALL	XY2
+	CMP	WORD PTR [DI+OFFSET NUMBER_FLAG],0
+	JNZ	PUT_3
+	INC	AL
+	MOV	DX,BX			;DX=空いてるマスの座標
+PUT_3:
+	CMP	AL,2
+	JNZ	PUT_A
+	MOV	BL,9
+PUT_A:
+	INC	BL
+	CMP	BL,10
+	JNZ	PUT_2
+
+	CMP	AL,1
+	JNZ	PUT_4
+	PUSH	BX
+	MOV	BX,DX
+	CALL	XY
+	MOV	AL,BYTE PTR NOW_NUMBER
+	MOV	BYTE PTR [DI+OFFSET NUMBER],AL
+	CMP	BYTE PTR LEVEL,3
+	JZ	SC_1
+	MOV	AH,1
+	CALL	SCREEN_SUB
+SC_1:
+	POP	BX
+PUT_4:
+	INC	BH
+	CMP	BH,10
+	JNZ	PUT_1
+
+	MOV	BL,1
+PUT_5:
+	MOV	BH,1
+	XOR	AL,AL			;AL=空いてるマスの数
+PUT_6:
+	CALL	XY2
+	CMP	WORD PTR [DI+OFFSET NUMBER_FLAG],0
+	JNZ	PUT_7
+	INC	AL
+	MOV	DX,BX			;DX=空いてるマスの座標
+PUT_7:
+	CMP	AL,2
+	JNZ	PUT_B
+	MOV	BH,9
+PUT_B:
+	INC	BH
+	CMP	BH,10
+	JNZ	PUT_6
+	CMP	AL,1
+	JNZ	PUT_8
+	PUSH	BX
+	MOV	BX,DX
+	CALL	XY
+	MOV	AL,BYTE PTR NOW_NUMBER
+	MOV	BYTE PTR [DI+OFFSET NUMBER],AL
+	CMP	BYTE PTR LEVEL,3
+	JZ	SC_2
+	MOV	AH,1
+	CALL	SCREEN_SUB
+SC_2:
+	POP	BX
+PUT_8:
+	INC	BL
+	CMP	BL,10
+	JNZ	PUT_5
+
+	MOV	BX,0101H
+	MOV	CL,3
+PUT_3_3_1:
+	MOV	CH,3
+PUT_3_3_2:
+	PUSH	CX
+	XOR	AL,AL
+	MOV	CL,3
+PUT_3_3_3:
+	MOV	CH,3
+PUT_3_3_5:
+	CALL	XY2
+	CMP	WORD PTR [DI+OFFSET NUMBER_FLAG],0
+	JNZ	PUT_3_3_6
+	INC	AL
+	MOV	DX,BX			;DX=空いてるマスの座標
+PUT_3_3_6:
+	INC	BL
+	DEC	CH
+	JNZ	PUT_3_3_5
+	SUB	BL,3
+	INC	BH
+	LOOP	PUT_3_3_3
+
+	CMP	AL,1
+	JNZ	PUT_3_3_7
+
+	PUSH	BX
+	MOV	BX,DX
+	CALL	XY
+	MOV	AL,BYTE PTR NOW_NUMBER
+	MOV	BYTE PTR [DI+OFFSET NUMBER],AL
+	CMP	BYTE PTR LEVEL,3
+	JZ	SC_3
+	MOV	AH,1
+	CALL	SCREEN_SUB
+SC_3:
+	POP	BX
+PUT_3_3_7:
+	POP	CX
+	SUB	BH,3
+	ADD	BL,3
+	DEC	CH
+	JNZ	PUT_3_3_2
+	SUB	BL,9
+	ADD	BH,3
+	LOOP	PUT_3_3_1
+	POPA
+	RET
+
+;******************************************************************************
+;入れやすいマスを探す。
+;******************************************************************************
+LEVEL_2_MAIN:
+	PUSHA
+	CALL	FLAG_CLEAR
+	MOV	BYTE PTR NOW_NUMBER,1
+MASU_B:
+	CALL	FLAG_CHECK_BEGIN_2
+	INC	BYTE PTR NOW_NUMBER
+	CMP	BYTE PTR NOW_NUMBER,10
+	JNZ	MASU_B
+
+	MOV	BH,1
+MASU_A:
+	MOV	BL,1
+MASU_1:
+	CALL	XY
+	CMP	BYTE PTR [DI+OFFSET NUMBER],0
+	JNZ	MASU_PUT_3
+	XOR	DL,DL
+	CALL	XY2
+	MOV	AX,WORD PTR [DI+OFFSET NUMBER_FLAG]
+	XOR	CX,CX
+	MOV	CL,1
+MASU_PUT_1:
+	RCR	AX,1
+	JC	MASU_PUT_2
+	INC	DL
+	MOV	DH,CL
+MASU_PUT_2:
+	INC	CL
+	CMP	CL,10
+	JNZ	MASU_PUT_1
+
+	CMP	DL,1
+	JNZ	MASU_PUT_3
+	CALL	XY
+	MOV	BYTE PTR [DI+OFFSET NUMBER],DH
+	CMP	BYTE PTR LEVEL,3
+	JZ	SC_4
+	MOV	AH,1
+	CALL	SCREEN_SUB
+SC_4:
+MASU_PUT_3:
+	INC	BL
+	CMP	BL,10
+	JNZ	MASU_1
+	INC	BH
+	CMP	BH,10
+	JNZ	MASU_A
+	POPA
+	RET
+
+;******************************************************************************
+;解析が進んでいるか？
+;******************************************************************************
+CLEAR_CHECK:
+	PUSHA
+	CALL	FILLED			;数字の埋まっているマスの数を数える
+	CMP	AL,81			;CLEAR_CHECK_FLAG=-1 クリア
+	JNZ	CLEAR_CHECK_1
+	MOV	AH,-1
+	JMP	CLEAR_CHECK_2
+CLEAR_CHECK_1:
+	CMP	AL,BYTE PTR FINISH_CHECK
+	JNZ	CLEAR_CHECK_2
+	MOV	AH,2			;CLEAR_CHECK_FLAG=2 前回から変化なし
+CLEAR_CHECK_2:
+	MOV	BYTE PTR CLEAR_CHECK_FLAG,AH
+	MOV	BYTE PTR FINISH_CHECK,AL
+	POPA
+	RET
+
+FILLED:
+	XOR	AX,AX
+	MOV	CX,81
+	MOV	DI,OFFSET NUMBER
+FILLED_1:
+	CMP	BYTE PTR [DI],0
+	JZ	FILLED_2
+	INC	AL
+FILLED_2:
+	INC	DI
+	LOOP	FILLED_1
+	RET
+
+;******************************************************************************
+;矛盾が生じないかを調べる。
+;******************************************************************************
+PARADOX:				;CLEAR_CHECK_FLAG=1 矛盾
+	PUSHA
+
+	MOV	BH,1
+PARADOX_1:
+	MOV	BL,1
+	XOR	DX,DX			;同じ数字がダブってないか
+	XOR	SI,SI
+PARADOX_2:
+	CALL	XY
+	MOV	CL,BYTE PTR [DI+OFFSET NUMBER]
+	CMP	CL,0
+	JZ	PARADOX_3
+	XOR	AX,AX
+	STC
+	RCL	AX,CL
+	OR	DX,AX
+
+	CMP	SI,DX
+	JNZ	PARADOX_3
+	MOV	BYTE PTR CLEAR_CHECK_FLAG,1
+PARADOX_3:
+	MOV	SI,DX
+	INC	BL
+	CMP	BL,10
+	JNZ	PARADOX_2
+	INC	BH
+	CMP	BH,10
+	JNZ	PARADOX_1
+
+	MOV	BL,1
+PARADOX_4:
+	MOV	BH,1
+	XOR	DX,DX			;同じ数字がダブってないか
+	XOR	SI,SI
+PARADOX_5:
+	CALL	XY
+	MOV	CL,BYTE PTR [DI+OFFSET NUMBER]
+	CMP	CL,0
+	JZ	PARADOX_6
+	XOR	AX,AX
+	STC
+	RCL	AX,CL
+	OR	DX,AX
+
+	CMP	SI,DX
+	JNZ	PARADOX_6
+	MOV	BYTE PTR CLEAR_CHECK_FLAG,1
+PARADOX_6:
+	MOV	SI,DX
+	INC	BH
+	CMP	BH,10
+	JNZ	PARADOX_5
+	INC	BL
+	CMP	BL,10
+	JNZ	PARADOX_4
+
+	MOV	BX,0101H
+	MOV	CL,3
+PARADOX_3_3_1:
+	MOV	CH,3
+PARADOX_3_3_2:
+	XOR	SI,SI
+	XOR	DX,DX
+	PUSH	CX
+	MOV	CL,3
+PARADOX_3_3_3:
+	MOV	CH,3
+PARADOX_3_3_5:
+	CALL	XY
+	CMP	BYTE PTR [DI+OFFSET NUMBER],0
+	JZ	PARADOX_3_3_6
+	PUSH	CX
+	MOV	CL,BYTE PTR [DI+OFFSET NUMBER]
+	XOR	AX,AX
+	STC
+	RCL	AX,CL
+	POP	CX
+	OR	DX,AX
+
+	CMP	SI,DX
+	JNZ	PARADOX_3_3_6
+	MOV	BYTE PTR CLEAR_CHECK_FLAG,1
+
+PARADOX_3_3_6:
+	MOV	SI,DX
+	INC	BL
+	DEC	CH
+	JNZ	PARADOX_3_3_5
+	SUB	BL,3
+	INC	BH
+	LOOP	PARADOX_3_3_3
+
+PARADOX_3_3_7:
+	POP	CX
+	SUB	BH,3
+	ADD	BL,3
+	DEC	CH
+	JNZ	PARADOX_3_3_2
+	SUB	BL,9
+	ADD	BH,3
+	LOOP	PARADOX_3_3_1
+
+	MOV	BYTE PTR NOW_NUMBER,1	;空いてるマスに数字を入れる余地があるか
+	CALL	FLAG_CHECK_BEGIN
+
+	MOV	BH,1
+SPACE_1:
+	MOV	BL,1
+	XOR	AL,AL
+SPACE_2:
+	CALL	XY
+	MOV	AH,BYTE PTR NOW_NUMBER
+	CMP	BYTE PTR [DI+OFFSET NUMBER],AH
+	JZ	SPACE_4			;その数字が既にあるときは
+					;入る余地について考える必要はない
+	CALL	XY2
+	CMP	WORD PTR [DI+OFFSET NUMBER_FLAG],0
+	JNZ	SPACE_3
+	INC	AL
+SPACE_3:
+	INC	BL
+	CMP	BL,10
+	JNZ	SPACE_2
+	CMP	AL,0
+	JNZ	SPACE_4
+	MOV	BYTE PTR CLEAR_CHECK_FLAG,1
+SPACE_4:
+	INC	BH
+	CMP	BH,10
+	JNZ	SPACE_1
+
+	MOV	BL,1
+SPACE_5:
+	MOV	BH,1
+	XOR	AL,AL
+SPACE_6:
+	CALL	XY
+	MOV	AH,BYTE PTR NOW_NUMBER
+	CMP	BYTE PTR [DI+OFFSET NUMBER],AH
+	JZ	SPACE_8			;その数字が既にあるときは
+					;入る余地について考える必要はない
+	CALL	XY2
+	CMP	WORD PTR [DI+OFFSET NUMBER_FLAG],0
+	JNZ	SPACE_7
+	INC	AL
+SPACE_7:
+	INC	BH
+	CMP	BH,10
+	JNZ	SPACE_6
+	CMP	AL,0
+	JNZ	SPACE_8
+	MOV	BYTE PTR CLEAR_CHECK_FLAG,1
+SPACE_8:
+	INC	BL
+	CMP	BL,10
+	JNZ	SPACE_5
+
+	MOV	BX,0101H
+	MOV	CL,3
+SPACE_3_3_1:
+	MOV	CH,3
+SPACE_3_3_2:
+	PUSH	CX
+	XOR	AL,AL
+	MOV	CL,3
+SPACE_3_3_3:
+	MOV	CH,3
+SPACE_3_3_5:
+	CALL	XY
+	MOV	AH,BYTE PTR NOW_NUMBER
+	CMP	BYTE PTR [DI+OFFSET NUMBER],AH
+	JNZ	SPACE_3_3_A		;その数字が既にあるときは
+					;入る余地について考える必要はない
+	MOV	AL,1
+SPACE_3_3_A:
+	CALL	XY2
+	CMP	WORD PTR [DI+OFFSET NUMBER_FLAG],0
+	JNZ	SPACE_3_3_6
+	INC	AL
+SPACE_3_3_6:
+	INC	BL
+	DEC	CH
+	JNZ	SPACE_3_3_5
+	SUB	BL,3
+	INC	BH
+	LOOP	SPACE_3_3_3
+
+	CMP	AL,0
+	JNZ	SPACE_3_3_7
+	MOV	BYTE PTR CLEAR_CHECK_FLAG,1
+
+SPACE_3_3_7:
+	POP	CX
+	SUB	BH,3
+	ADD	BL,3
+	DEC	CH
+	JNZ	SPACE_3_3_2
+	SUB	BL,9
+	ADD	BH,3
+	LOOP	SPACE_3_3_1
+	POPA
+	RET
+
+;******************************************************************************
+;画面表示
+;******************************************************************************
+SCREEN:
+	PUSH	AX
+	PUSH	BX
+	MOV	BH,1
+SCREEN_1:
+	MOV	BL,1
+SCREEN_2:
+	MOV	AH,0
+	CALL	SCREEN_SUB
+	INC	BL
+	CMP	BL,10
+	JNZ	SCREEN_2
+	INC	BH
+	CMP	BH,10
+	JNZ	SCREEN_1
+	POP	BX
+	POP	AX
+	RET
+
+SCREEN_SUB:
+	PUSHA
+	CMP	AH,0
+	JZ	SCREEN_SUB_1
+	MOV	AH,0BH
+	INT	41H
+SCREEN_SUB_1:
+	MOV	CX,BX
+	CMP	BH,7
+	JC	SCREEN_SUB_2
+	ADD	CL,10
+	SUB	CH,3
+SCREEN_SUB_2:
+	CMP	BH,4
+	JC	SCREEN_SUB_3
+	ADD	CL,10
+	SUB	CH,3
+SCREEN_SUB_3:
+	PUSH	BX
+	MOV	BX,CX   
+	MOV	AH,0FH
+	INT	41H
+	POP	BX
+	MOV	AH,1
+	CALL	XY
+	MOV	DL,BYTE PTR [DI+OFFSET NUMBER]
+	ADD	DL,30H
+	INT	41H
+	MOV	AH,0CH
+	INT	41H
+	POPA
+	RET
+
+;******************************************************************************
+;サブルーチンズ
+;******************************************************************************
+WINDOW:
+	PUSH	DI
+	MOV	AH,0BFH
+	MOV	SI,4249H
+	MOV	DI,4F53H
+	INT	41H
+	POP	DI
+
+	MOV	BL,74
+	MOV	BH,12
+	MOV	CL,110
+	MOV	CH,12
+WINDOW_1:
+	MOV	AH,13H
+	MOV	DL,81H
+	INT	41H
+	INC	BH
+	INC	CH
+	CMP	BH,27
+	JNZ	WINDOW_1
+	MOV	AH,0FH
+	MOV	BL,13
+	MOV	BH,2
+	INT	41H
+	MOV	AH,20H
+	INT	41H
+	MOV	AH,14H
+	MOV	BL,75
+	MOV	BH,13
+	MOV	CL,109
+	MOV	CH,25
+	MOV	DL,0
+	INT	41H
+	RET
+
+LEVEL_PRINT:
+	PUSHA
+	MOV	AH,0BCH
+	MOV	SI,4249H
+	MOV	DI,4F53H
+	INT	41H
+	MOV	AH,0BEH
+	MOV	DL,BYTE PTR LEVEL
+	INT	41H
+	POPA
+	RET
+
+XY:					;BL=X座標、BH=Y座標
+	PUSH	AX
+	XOR	DI,DI
+	MOV	AL,BH
+	DEC	AL
+	MOV	AH,9
+	MUL	AH
+	ADD	AL,BL
+	DEC	AL
+	MOV	DI,AX
+	POP	AX
+	RET
+
+XY2:
+	CALL	XY
+	ADD	DI,DI
+	RET
+
+WARI:					;AH/AL=AH...AL
+	PUSH	BX
+	PUSH	CX
+	XOR	BX,BX
+	MOV	BL,AH
+	MOV	CX,8
+WARI_L:
+	SAL	BX,1
+	MOV	AH,BH
+	SUB	AH,AL
+	JC	WARI_S
+	INC	BL
+	MOV	BH,AH
+WARI_S:
+	LOOP	WARI_L
+	MOV	AH,BL
+	MOV	AL,BH
+	POP	CX
+	POP	BX
+	RET
+
+;******************************************************************************
+;データ
+;******************************************************************************
+PUSH_SPACE_KEY:
+	DB	'PUSH SPACE KEY',0
+MOJI_CLEAR:
+	DB	'Clear',0
+MOJI_SORRY:
+	DB	'Sorry',0
+MOJI_ERROR:
+	DB	'Error',0
+COPYRIGHT_1:
+	DB	'1998 (C) Copyright by ABCP.',0
+COPYRIGHT_2:
+	DB	'All Rights Reserved.',0
+INPUT_MOJI:
+	DB	'[1,2,3]   [4,5,6]   [7,8,9]',0
+LINE_DAT:
+	DB	56,0,56,21,56,0,77,21,77,21,77,0
+	DB	86,21,96,0,96,0,106,21,89,14,103,14
+	DB	115,0,115,21,115,0,135,0,115,10,135,10,135,0,135,10,-1
+;******************************************************************************
+;ワークエリア
+;******************************************************************************
+NUMBER:
+	DB	81 DUP(?)
+NUMBER_BACKUP:
+	DB	81 DUP(?)
+NUMBER_FLAG:
+	DB	162 DUP(?)
+NUMBER_FLAG_BACKUP:
+	DB	162 DUP(?)
+FINISH_CHECK:
+	DB	1 DUP(?)
+FINISH_CHECK_BACKUP:
+	DB	1 DUP(?)
+NOW_NUMBER:
+	DB	1 DUP(?)
+NOW_NUMBER_BACKUP:
+	DB	1 DUP(?)
+CLEAR_CHECK_FLAG:
+	DB	1 DUP(?)
+LEVEL:
+	DB	1 DUP(?)
+
+CODE	ENDS
+	END	START

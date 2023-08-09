@@ -39,3 +39,4 @@
 | [Let's Screen Capture](lets-screen-capture/readme.md) | スクリーンキャプチャを取得するプログラム | マシン語 |
 | [MTOOL Ver1.00](mtool100/readme.md) | マシン語プログラムインストーラーを生成するBASICプログラム | BASIC |
 | [MTOOL Ver1.50](mtool150/readme.md) | マシン語プログラムインストーラーを生成するBASICプログラムの改良版 | BASIC |
+| [NAP（Number-place Auto-answering Program）](nap/readme.md) | ナンバープレース（数独）を自動的に解くプログラム | マシン語 |
