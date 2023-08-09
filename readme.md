@@ -2,7 +2,17 @@
 
 カシオのポケコンFX-890P向けの各種プログラム。使用言語はBASIC、アセンブラ。ゲームやユーティリティープログラムが中心。
 
-## ゲーム
+## 注意事項
+
+* 各プログラムに付属するreadme.mdは、雑誌掲載時の原稿をベースにしています。そのため、ファイル名や図表の番号など、一部正しくないものもありますが、ご了承ください。
+* 原則として、文字コードUTF-8、改行コードLFです。
+  * 拡張子BAS（BASICプログラム）は、文字コードS-JIS、改行コードCR+LFです。
+* 拡張子ASM（アセンブラソースリスト）は、内蔵アセンブラでアセンブルできるものと、MASMが必要なものがあります。詳しくは、各プログラムのreadme.mdを参照してください。
+* 拡張子BIN（マシン語のバイナリファイル）は```BLOAD```命令で読み込むことができます。
+
+## プログラム一覧
+
+### ゲーム
 
 | タイトル | 内容 | 言語 |
 | --- | --- | --- |
@@ -23,20 +33,25 @@
 | [ゼロヨン de GO!](zero-yon-de-go/readme.md) | ポケコンでできるゼロヨンゲーム | BASIC |
 | [モンキー de ウッキー](monkey/readme.md) | 流れてくる数字を10にして消すアクションパズルゲーム | BASIC |
 
-## ユーティリティー
+### 開発ツール
 
 | タイトル | 内容 | 言語 |
 | --- | --- | --- |
 | [Anytime Register](anytime-register/readme.md) | プログラム実行中に任意のタイミングでレジスタの値を表示するマシン語プログラム | マシン語 |
 | [Anytime Stopper](anytime-stopper/readme.md) | プログラム実行中に任意のタイミングでポーズさせるマシン語プログラム | マシン語 |
-| [BASIC Check Sum](basic-check-sum/readme.md) | BASICプログラムにチェックサムを | マシン語 |
-| [BASIC Command Converter](basic-command-converter/readme.md) | 省略形で入力したBASICコマンドのコンバーター | マシン語 |
 | [Data Convertor Ver.1.0](data-convertor/readme.md) | GPRINT形式のデータをDEFCHR$形式に変換 | BASIC |
 | [DisAssembler FX](disassembler-fx/readme.md) | ポケコン上で動くディスアセンブラ | BASIC |
-| [Here Comes the Boss](here-comes-the-boss/readme.md) | ボスが来たときにダミー画面を表示するマシン語プログラム | マシン語 |
 | [Real Inkey$](real-inkey/readme.md) | BASICで同時キー入力判定をするためのマシン語プログラム | マシン語 |
 | [LINES-5](lines5/readme.md) | BASICから5行表示を可能にするマシン語プログラム | マシン語 |
-| [Let's Screen Capture](lets-screen-capture/readme.md) | スクリーンキャプチャを取得するプログラム | マシン語 |
 | [MTOOL Ver1.00](mtool100/readme.md) | マシン語プログラムインストーラーを生成するBASICプログラム | BASIC |
 | [MTOOL Ver1.50](mtool150/readme.md) | マシン語プログラムインストーラーを生成するBASICプログラムの改良版 | BASIC |
+
+### ユーティリティー
+
+| タイトル | 内容 | 言語 |
+| --- | --- | --- |
+| [BASIC Check Sum](basic-check-sum/readme.md) | BASICプログラムにチェックサムを | マシン語 |
+| [BASIC Command Converter](basic-command-converter/readme.md) | 省略形で入力したBASICコマンドのコンバーター | マシン語 |
+| [Let's Screen Capture](lets-screen-capture/readme.md) | スクリーンキャプチャを取得するプログラム | マシン語 |
+| [Here Comes the Boss](here-comes-the-boss/readme.md) | ボスが来たときにダミー画面を表示するマシン語プログラム | マシン語 |
 | [NAP（Number-place Auto-answering Program）](nap/readme.md) | ナンバープレース（数独）を自動的に解くプログラム | マシン語 |
