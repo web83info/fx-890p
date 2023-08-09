@@ -18,6 +18,7 @@
 | [Overnight Sensation Remi2](overnight-sensation-remi2/readme.md) | 矢印を回転させて消すパズルゲームの改良版 | マシン語 |
 | [Panic Maker](panic-maker/readme.md) | 平面版ルービックキューブのようなゲーム | BASIC |
 | [Poker Action for FX-890P](poker-action/readme.md) | 流れてくるトランプを並べてポーカーの役を作る落ち物ゲーム | マシン語 |
+| [Reversible Panel](reversible-panel/readme.md) | パネルを裏返し、色を揃えるパズルゲーム | マシン語 |
 | [算数マスター](math-master/readme.md) | 正しい数式となるよう数字を並べる算数パズルゲーム | BASIC |
 | [ゼロヨン de GO!](zero-yon-de-go/readme.md) | ポケコンでできるゼロヨンゲーム | BASIC |
 | [モンキー de ウッキー](monkey/readme.md) | 流れてくる数字を10にして消すアクションパズルゲーム | BASIC |
