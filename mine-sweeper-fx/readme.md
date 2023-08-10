@@ -6,15 +6,19 @@ FX-890PとZ-1GRで動作確認しました。Z-1でも動きます。（推測�
 
 ## 入力方法
 
-まず、マシン語エリアを&H1AB6以上確保します。
+まず、マシン語エリアを&H1AB6（6838）バイト以上確保します。
 
 ```
 CLEAR 1024,6838,10240
 ```
 
-次に、プログラムリストをRUNして下さい。プログラム本体は、2000Hから2B52Hまでの2899バイトです。
+次に、プログラムリストをRUNして下さい。プログラム本体は、2000Hから2B52Hまでの2899バイトです。保存は、
 
-実行は
+```
+BSAVE "MIME.BIN",&H2000,2899,&H2000
+```
+
+です。実行は、
 
 ```
 DEFSEG=0
@@ -49,15 +53,15 @@ BIOSを使って画面表示をすると4行しか表示できませんが、LCD
 
 ![コピーライト](screenshot_01_copyright.png)
 
-![コピーライト](screenshot_02_title.png)
+![タイトル](screenshot_02_title.png)
 
-![コピーライト](screenshot_03_game.png)
+![ゲーム](screenshot_03_game.png)
 
-![コピーライト](screenshot_04_failure.png)
+![失敗](screenshot_04_failure.png)
 
-![コピーライト](screenshot_05_success.png)
+![成功](screenshot_05_success.png)
 
-![コピーライト](screenshot_06_custom.png)
+![カスタム](screenshot_06_custom.png)
 
 ## Q&A
 
