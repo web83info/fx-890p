@@ -465,7 +465,7 @@ RGSTNAME:
         DB      'IPFL'
 NAME_END:
 FONT:
-        DW      0,0
+        DW      2 DUP(?)
 AXTOFL:
         DW      14 DUP(?)
 VRAM:
